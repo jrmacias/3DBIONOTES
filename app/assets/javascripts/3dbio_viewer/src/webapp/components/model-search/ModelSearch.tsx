@@ -72,7 +72,7 @@ export const ModelSearch: React.FC<ModelSearchProps> = React.memo(props => {
         itemsCount: 0,
         data: [],
     });
-
+    // && inputValue !== ""
     const search = React.useCallback(
         (query: string) => {
             setSearchState({ type: "searching" });
@@ -106,7 +106,12 @@ export const ModelSearch: React.FC<ModelSearchProps> = React.memo(props => {
         },
         [startSearch]
     );
-
+    React.useEffect(() => {
+        if(inputValue === "") 
+        {
+            search("domain_source");
+        }
+    }, [modelTypeState, inputValue]);
     React.useEffect(() => {
         if (searchState.type === "results") {
             setFormState((prevForm: any) => {
@@ -120,7 +125,9 @@ export const ModelSearch: React.FC<ModelSearchProps> = React.memo(props => {
                             return acc;
                         }
                     }, []);
-
+                console.log(searchState.data)
+                console.log(newItems)
+                
                 const newState = {
                     ...prevForm,
                     data: newItems,
@@ -196,7 +203,7 @@ export const ModelSearch: React.FC<ModelSearchProps> = React.memo(props => {
                 </div>
 
                 <div className="results">
-                    {formState.data.length > 0 && inputValue !== "" && (
+                    {formState.data.length > 0 && (
                         <React.Fragment>
                             <InfiniteScroll
                                 style={{ flexDirection: "row", display: "flex", flexWrap: "wrap" }}

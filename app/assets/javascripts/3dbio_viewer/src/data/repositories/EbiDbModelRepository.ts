@@ -60,10 +60,15 @@ const apiFields = ["name", "author", "method", "resolution", "specimenstate"] as
 
 type ApiField = typeof apiFields[number];
 
+/*
+new 
+*/
 interface ApiSearchParams {
     format: "JSON";
     size?: number;
     start?: number;
+    sortfield?: string;
+    order?: string;
     requestFrom?: "queryBuilder";
     fieldurl?: boolean;
     fields?: string;
@@ -120,9 +125,21 @@ function getPdbModels(
         entryattrs: "score",
         fieldurl: true,
     };
+    console.log(config.type)
+    const onLoadParams: ApiSearchParams = {
+        format: "JSON",
+        // Get more records so we can do a more meaningful sorting by score on the grouped collection
+        size: 100,
+        start: startIndex,
+        fields: config.type === "pdb" ? "name,creation_date" : "name,headerReleaseDate_date",
+        query: `${searchQuery}:${config.type === "pdb" ? "pdbe" : "emdb"}`,
+        order: "descending",
+        sortfield: "creation_date",
+        entryattrs: "score",
+        fieldurl: true,
+    };
 
-    const pdbResults = request<ApiSearchResponse>({ url: config.searchUrl, params });
-
+    const pdbResults = request<ApiSearchResponse>({ url: config.searchUrl, params: searchQuery === "domain_source" ?  onLoadParams : params});
     return pdbResults.map((res): DbModel[] => {
         return res.entries.map(entry => ({
             type: config.type,
